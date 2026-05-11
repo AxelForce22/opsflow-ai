@@ -1,0 +1,90 @@
+/* ---- Light theme (default) ---- */
+:root {
+  --bg:            #f1f5f9;
+  --surface:       #ffffff;
+  --surface-2:     #f8fafc;
+  --border:        #e2e8f0;
+  --text:          #0f172a;
+  --text-2:        #475569;
+  --text-muted:    #94a3b8;
+
+  --primary:       #4f46e5;
+  --primary-dark:  #4338ca;
+  --primary-light: #eef2ff;
+
+  --success:       #10b981;
+  --success-light: #ecfdf5;
+  --success-text:  #065f46;
+
+  --warning:       #f59e0b;
+  --warning-light: #fffbeb;
+  --warning-text:  #92400e;
+
+  --danger:        #ef4444;
+  --danger-light:  #fef2f2;
+  --danger-text:   #991b1b;
+
+  --info:          #0ea5e9;
+  --info-light:    #f0f9ff;
+  --info-text:     #0369a1;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow:    0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+
+  --radius:    10px;
+  --radius-sm: 6px;
+}
+
+/* ---- Dark theme ---- */
+[data-theme="dark"] {
+  --bg:            #0d1117;
+  --surface:       #161b22;
+  --surface-2:     #1c2128;
+  --border:        #30363d;
+  --text:          #e6edf3;
+  --text-2:        #8b949e;
+  --text-muted:    #6e7681;
+
+  --primary:       #6366f1;
+  --primary-dark:  #5457d4;
+  --primary-light: #1e1b4b;
+
+  --success:       #3fb950;
+  --success-light: #0d2a16;
+  --success-text:  #3fb950;
+
+  --warning:       #d97706;
+  --warning-light: #1f1200;
+  --warning-text:  #fbbf24;
+
+  --danger:        #f85149;
+  --danger-light:  #200d0d;
+  --danger-text:   #f85149;
+
+  --info:          #38bdf8;
+  --info-light:    #082032;
+  --info-text:     #38bdf8;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow:    0 1px 3px rgba(0,0,0,0.5);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.5);
+}
+
+/* ---- Base reset ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.2s, color 0.2s;
+}
+
+#root { min-height: 100vh; }
+h1, h2, h3 { font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; font-size: 14px; }
