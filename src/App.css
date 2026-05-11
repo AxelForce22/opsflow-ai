@@ -2,7 +2,8 @@
    OpsFlow AI — App Styles
    Structure: Layout → Header → Sidebar → KPI Cards →
               Cards → Tables → Badges → Buttons → Modal →
-              Forms → Budget → Activity → About → Responsive
+              Forms → Budget → Activity → About →
+              BI Dashboard → Responsive
    ============================================================ */
 
 /* ---- Layout ---- */
@@ -652,6 +653,122 @@ tbody td { padding: 13px 16px; color: var(--text); vertical-align: middle; line-
 .empty-state__icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
 .empty-state__title { font-size: 14px; font-weight: 600; color: var(--text-2); margin-bottom: 4px; }
 .empty-state p { font-size: 13px; }
+
+/* ============================================================
+   BI Dashboard Styles
+   ============================================================ */
+
+/* ---- BI Filters ---- */
+.bi-filters-card .card__header { flex-wrap: wrap; gap: 10px; }
+
+.bi-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+.bi-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bi-filter-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* ---- Executive Summary insights ---- */
+.insight-list {
+  padding: 4px 0;
+}
+
+.insight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+.insight-item:last-child { border-bottom: none; }
+.insight-item:hover { background: var(--surface-2); }
+
+/* Coloured icon circle for each insight */
+.insight-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: #fff;
+}
+.insight-icon--blue   { background: var(--primary); }
+.insight-icon--green  { background: var(--success); }
+.insight-icon--orange { background: var(--warning); }
+.insight-icon--red    { background: var(--danger); }
+
+.insight-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+  padding-top: 4px;
+}
+
+/* ---- BI KPI strip (horizontal row of mini-stats) ---- */
+.bi-kpi-strip {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.bi-kpi {
+  flex: 1 1 140px;
+  padding: 16px 20px;
+  border-right: 1px solid var(--border);
+}
+.bi-kpi:last-child { border-right: none; }
+
+.bi-kpi__label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 5px;
+}
+
+.bi-kpi__value { font-size: 22px; font-weight: 700; color: var(--text); }
+.bi-kpi__sub   { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* Colour variants for BI KPI values */
+.bi-kpi--danger  .bi-kpi__value { color: var(--danger); }
+.bi-kpi--success .bi-kpi__value { color: var(--success); }
+.bi-kpi--warning .bi-kpi__value { color: var(--warning); }
+
+/* ---- Risk card action line ---- */
+.risk-card__action {
+  font-size: 11px;
+  color: var(--text-2);
+  font-style: italic;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* ---- Over-budget row highlight in budget table ---- */
+.row--over-budget { background: color-mix(in srgb, var(--danger) 5%, var(--surface)) !important; }
+.row--over-budget:hover { background: color-mix(in srgb, var(--danger) 9%, var(--surface)) !important; }
 
 /* ============================================================
    Responsive — mobile below 900px

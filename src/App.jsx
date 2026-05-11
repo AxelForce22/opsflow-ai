@@ -12,6 +12,7 @@ import TaskTable      from "./components/TaskTable.jsx";
 import TaskModal      from "./components/TaskModal.jsx";
 import BudgetAnalysis from "./components/BudgetAnalysis.jsx";
 import RiskOverview   from "./components/RiskOverview.jsx";
+import BIDashboard    from "./pages/BIDashboard.jsx";
 import ActivityLog    from "./components/ActivityLog.jsx";
 import AboutSection   from "./components/AboutSection.jsx";
 
@@ -184,6 +185,11 @@ export default function App() {
               </div>
               <ActivityLog activities={activities} />
             </div>
+          )}
+
+          {/* Business Intelligence */}
+          {activeTab === "bi" && (
+            <BIDashboard projects={projects} tasks={tasks} />
           )}
 
           {/* About */}
