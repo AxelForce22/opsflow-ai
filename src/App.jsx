@@ -3,16 +3,18 @@ import "./App.css";
 
 import { DEMO_PROJECTS, DEMO_TASKS, DEMO_ACTIVITY } from "./data/demoData.js";
 
-import Header        from "./components/Header.jsx";
-import KpiCards      from "./components/KpiCards.jsx";
-import ProjectTable  from "./components/ProjectTable.jsx";
-import ProjectModal  from "./components/ProjectModal.jsx";
-import TaskTable     from "./components/TaskTable.jsx";
-import TaskModal     from "./components/TaskModal.jsx";
+import Header         from "./components/Header.jsx";
+import Sidebar        from "./components/Sidebar.jsx";
+import KpiCards       from "./components/KpiCards.jsx";
+import ProjectTable   from "./components/ProjectTable.jsx";
+import ProjectModal   from "./components/ProjectModal.jsx";
+import TaskTable      from "./components/TaskTable.jsx";
+import TaskModal      from "./components/TaskModal.jsx";
 import BudgetAnalysis from "./components/BudgetAnalysis.jsx";
-import ActivityLog   from "./components/ActivityLog.jsx";
-import AboutSection  from "./components/AboutSection.jsx";
+import ActivityLog    from "./components/ActivityLog.jsx";
+import AboutSection   from "./components/AboutSection.jsx";
 
+// --- localStorage helpers ---
 function load(key, fallback) {
   try {
     const raw = localStorage.getItem(key);
@@ -21,36 +23,34 @@ function load(key, fallback) {
     return fallback;
   }
 }
-
 function save(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
 let nextId = Date.now();
-function genId() { return ++nextId; }
-
+function genId()  { return ++nextId; }
 function nowIso() { return new Date().toISOString(); }
 
 export default function App() {
-  const [darkMode,   setDarkMode]   = useState(() => load("opsflow_dark", false));
-  const [activeTab,  setActiveTab]  = useState("dashboard");
-  const [projects,   setProjects]   = useState(() => load("opsflow_projects", DEMO_PROJECTS));
-  const [tasks,      setTasks]      = useState(() => load("opsflow_tasks",    DEMO_TASKS));
-  const [activities, setActivities] = useState(() => load("opsflow_activity", DEMO_ACTIVITY));
+  const [darkMode,     setDarkMode]     = useState(() => load("opsflow_dark",     false));
+  const [activeTab,    setActiveTab]    = useState("dashboard");
+  const [sidebarOpen,  setSidebarOpen]  = useState(false); // mobile sidebar toggle
+  const [projects,     setProjects]     = useState(() => load("opsflow_projects", DEMO_PROJECTS));
+  const [tasks,        setTasks]        = useState(() => load("opsflow_tasks",    DEMO_TASKS));
+  const [activities,   setActivities]   = useState(() => load("opsflow_activity", DEMO_ACTIVITY));
 
-  // Modals
   const [projectModal, setProjectModal] = useState(null); // null | "new" | project object
   const [taskModal,    setTaskModal]    = useState(null); // null | "new" | task object
 
-  // Dark mode
+  // Apply dark mode to the whole page
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
     save("opsflow_dark", darkMode);
   }, [darkMode]);
 
-  // Persist
-  useEffect(() => { save("opsflow_projects", projects); }, [projects]);
-  useEffect(() => { save("opsflow_tasks",    tasks);    }, [tasks]);
+  // Persist all state to localStorage whenever it changes
+  useEffect(() => { save("opsflow_projects", projects);   }, [projects]);
+  useEffect(() => { save("opsflow_tasks",    tasks);      }, [tasks]);
   useEffect(() => { save("opsflow_activity", activities); }, [activities]);
 
   function addActivity(message) {
@@ -72,7 +72,7 @@ export default function App() {
 
   function handleDeleteProject(id) {
     const proj = projects.find((p) => p.id === id);
-    if (!window.confirm(`Delete project "${proj?.name}"? This will not delete its tasks.`)) return;
+    if (!window.confirm(`Delete project "${proj?.name}"? Tasks linked to it are not deleted.`)) return;
     setProjects((prev) => prev.filter((p) => p.id !== id));
     addActivity(`Project '${proj?.name}' deleted`);
   }
@@ -100,57 +100,94 @@ export default function App() {
   return (
     <div className="app">
       <Header
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        onMenuToggle={() => setSidebarOpen((o) => !o)}
       />
 
-      {activeTab === "dashboard" && (
-        <div className="page">
-          <div className="page__title">Dashboard</div>
-          <div className="page__subtitle">Live overview of all projects and tasks</div>
-          <KpiCards projects={projects} tasks={tasks} />
-          <ActivityLog activities={activities} />
-        </div>
-      )}
+      <div className="layout">
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          tasks={tasks}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
 
-      {activeTab === "projects" && (
-        <div className="page">
-          <div className="page__title">Projects</div>
-          <div className="page__subtitle">Manage all your projects</div>
-          <ProjectTable
-            projects={projects}
-            onAdd={() => setProjectModal("new")}
-            onEdit={(p) => setProjectModal(p)}
-            onDelete={handleDeleteProject}
-          />
-        </div>
-      )}
+        <main className="main">
 
-      {activeTab === "tasks" && (
-        <div className="page">
-          <div className="page__title">Tasks</div>
-          <div className="page__subtitle">Track all tasks across projects</div>
-          <TaskTable
-            tasks={tasks}
-            projects={projects}
-            onAdd={() => setTaskModal("new")}
-            onEdit={(t) => setTaskModal(t)}
-            onDelete={handleDeleteTask}
-          />
-        </div>
-      )}
+          {/* Dashboard */}
+          {activeTab === "dashboard" && (
+            <div className="page">
+              <div className="page__header">
+                <div className="page__title">Dashboard</div>
+                <div className="page__subtitle">Live overview of all projects and tasks</div>
+              </div>
+              <KpiCards projects={projects} tasks={tasks} />
+              <ActivityLog activities={activities} />
+            </div>
+          )}
 
-      {activeTab === "budget" && (
-        <div className="page">
-          <div className="page__title">Budget Analysis</div>
-          <div className="page__subtitle">Budget vs actual spend across all projects</div>
-          <BudgetAnalysis projects={projects} />
-        </div>
-      )}
+          {/* Projects */}
+          {activeTab === "projects" && (
+            <div className="page">
+              <div className="page__header">
+                <div className="page__title">Projects</div>
+                <div className="page__subtitle">Create, edit and track all your projects</div>
+              </div>
+              <ProjectTable
+                projects={projects}
+                onAdd={() => setProjectModal("new")}
+                onEdit={(p) => setProjectModal(p)}
+                onDelete={handleDeleteProject}
+              />
+            </div>
+          )}
 
-      {activeTab === "about" && <AboutSection />}
+          {/* Tasks */}
+          {activeTab === "tasks" && (
+            <div className="page">
+              <div className="page__header">
+                <div className="page__title">Tasks</div>
+                <div className="page__subtitle">Track all tasks across every project</div>
+              </div>
+              <TaskTable
+                tasks={tasks}
+                projects={projects}
+                onAdd={() => setTaskModal("new")}
+                onEdit={(t) => setTaskModal(t)}
+                onDelete={handleDeleteTask}
+              />
+            </div>
+          )}
+
+          {/* Budget */}
+          {activeTab === "budget" && (
+            <div className="page">
+              <div className="page__header">
+                <div className="page__title">Budget Analysis</div>
+                <div className="page__subtitle">Budget vs actual spend across all projects</div>
+              </div>
+              <BudgetAnalysis projects={projects} />
+            </div>
+          )}
+
+          {/* Activity Log */}
+          {activeTab === "activity" && (
+            <div className="page">
+              <div className="page__header">
+                <div className="page__title">Activity Log</div>
+                <div className="page__subtitle">All recent changes and events</div>
+              </div>
+              <ActivityLog activities={activities} />
+            </div>
+          )}
+
+          {/* About */}
+          {activeTab === "about" && <AboutSection />}
+
+        </main>
+      </div>
 
       {/* Modals */}
       {projectModal && (

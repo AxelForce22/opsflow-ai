@@ -1,30 +1,75 @@
 import { formatCurrency, isOverdue } from "../utils.js";
 
 export default function KpiCards({ projects, tasks }) {
-  const totalBudget  = projects.reduce((s, p) => s + (p.budget || 0), 0);
-  const totalSpent   = projects.reduce((s, p) => s + (p.actualCost || 0), 0);
-  const activeCount  = projects.filter((p) => p.status === "Active").length;
-  const overdueTasks = tasks.filter((t) => isOverdue(t.dueDate, t.status)).length;
-  const avgProgress  = projects.length
-    ? Math.round(projects.reduce((s, p) => s + (p.progress || 0), 0) / projects.length)
-    : 0;
-  const overBudget   = projects.filter((p) => p.actualCost > p.budget).length;
+  // --- Calculate each KPI ---
 
+  const totalProjects  = projects.length;
+
+  const activeProjects = projects.filter((p) => p.status === "Active").length;
+
+  const overdueTasks   = tasks.filter((t) => isOverdue(t.dueDate, t.status)).length;
+
+  // Budget variance: positive = under budget (good), negative = over budget (bad)
+  const totalBudget    = projects.reduce((s, p) => s + (p.budget     || 0), 0);
+  const totalSpent     = projects.reduce((s, p) => s + (p.actualCost || 0), 0);
+  const variance       = totalBudget - totalSpent;
+
+  // Completion rate: percentage of tasks marked "Done"
+  const doneTasks      = tasks.filter((t) => t.status === "Done").length;
+  const completionRate = tasks.length > 0 ? Math.round((doneTasks / tasks.length) * 100) : 0;
+
+  // High priority tasks that are not yet done
+  const highPriorityOpen = tasks.filter(
+    (t) => t.priority === "High" && t.status !== "Done"
+  ).length;
+
+  // Build the 6 card definitions
   const cards = [
-    { label: "Total Projects",  value: projects.length,          sub: "all projects",         variant: "" },
-    { label: "Active Projects", value: activeCount,              sub: "currently running",    variant: "primary" },
-    { label: "Total Tasks",     value: tasks.length,             sub: "across all projects",  variant: "" },
-    { label: "Overdue Tasks",   value: overdueTasks,             sub: "past due date",        variant: overdueTasks > 0 ? "danger" : "success" },
-    { label: "Total Budget",    value: formatCurrency(totalBudget), sub: "planned spend",     variant: "" },
-    { label: "Total Spent",     value: formatCurrency(totalSpent),  sub: "actual cost",       variant: totalSpent > totalBudget ? "danger" : "success" },
-    { label: "Avg Progress",    value: `${avgProgress}%`,        sub: "across active projects", variant: "primary" },
-    { label: "Over Budget",     value: overBudget,               sub: "projects",             variant: overBudget > 0 ? "warning" : "success" },
+    {
+      label:   "Total Projects",
+      value:   totalProjects,
+      sub:     `${activeProjects} active`,
+      variant: "primary",
+    },
+    {
+      label:   "Active Projects",
+      value:   activeProjects,
+      sub:     "currently running",
+      variant: "success",
+    },
+    {
+      label:   "Overdue Tasks",
+      value:   overdueTasks,
+      sub:     overdueTasks === 0 ? "all on track" : "past due date",
+      variant: overdueTasks > 0 ? "danger" : "success",
+    },
+    {
+      label:   "Budget Variance",
+      value:   (variance >= 0 ? "+" : "") + formatCurrency(variance),
+      sub:     variance >= 0 ? "under budget" : "over budget",
+      variant: variance >= 0 ? "success" : "danger",
+    },
+    {
+      label:   "Completion Rate",
+      value:   `${completionRate}%`,
+      sub:     `${doneTasks} of ${tasks.length} tasks done`,
+      variant: completionRate >= 75 ? "success" : completionRate >= 40 ? "warning" : "primary",
+    },
+    {
+      label:   "High Priority",
+      value:   highPriorityOpen,
+      sub:     "open high-priority tasks",
+      variant: highPriorityOpen > 3 ? "danger" : highPriorityOpen > 0 ? "warning" : "success",
+    },
   ];
 
   return (
     <div className="kpi-grid">
       {cards.map((card) => (
-        <div key={card.label} className={`kpi-card${card.variant ? ` kpi-card--${card.variant}` : ""}`}>
+        <div
+          key={card.label}
+          className={`kpi-card${card.variant ? ` kpi-card--${card.variant}` : ""}`}
+        >
           <div className="kpi-card__label">{card.label}</div>
           <div className="kpi-card__value">{card.value}</div>
           <div className="kpi-card__sub">{card.sub}</div>

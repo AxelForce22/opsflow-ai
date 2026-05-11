@@ -16,8 +16,9 @@ export default function TaskTable({ tasks, projects, onAdd, onEdit, onDelete }) 
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir("asc"); }
   }
-  const sortIcon = (key) => sortKey === key ? (sortDir === "asc" ? " ▲" : " ▼") : "";
+  const arrow = (key) => sortKey === key ? (sortDir === "asc" ? " ▲" : " ▼") : "";
 
+  // Build a lookup: project id → project name
   const projectMap = Object.fromEntries(projects.map((p) => [p.id, p.name]));
 
   const filtered = tasks
@@ -43,15 +44,15 @@ export default function TaskTable({ tasks, projects, onAdd, onEdit, onDelete }) 
   return (
     <div className="card">
       <div className="card__header">
-        <span className="card__title">Tasks</span>
-        <span className="td-muted">{filtered.length} of {tasks.length}</span>
-        <button className="btn btn--primary btn--sm" onClick={onAdd}>+ Add Task</button>
+        <span className="card__title">All Tasks</span>
+        <span className="card__count">{filtered.length} / {tasks.length}</span>
+        <button className="btn btn--primary btn--sm" onClick={onAdd}>+ New Task</button>
       </div>
 
       <div className="toolbar">
         <input
           className="search-input"
-          placeholder="Search tasks…"
+          placeholder="Search by title or owner…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -67,34 +68,38 @@ export default function TaskTable({ tasks, projects, onAdd, onEdit, onDelete }) 
         </select>
         {hasFilters && (
           <button className="btn btn--ghost btn--sm" onClick={() => { setSearch(""); setStatusF("All"); setPrioF("All"); setProjectF("All"); }}>
-            Clear
+            Clear filters
           </button>
         )}
       </div>
 
       <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th className="sortable" onClick={() => toggleSort("title")}>Task{sortIcon("title")}</th>
-              <th className="sortable" onClick={() => toggleSort("projectId")}>Project{sortIcon("projectId")}</th>
-              <th className="sortable" onClick={() => toggleSort("priority")}>Priority{sortIcon("priority")}</th>
-              <th className="sortable" onClick={() => toggleSort("status")}>Status{sortIcon("status")}</th>
-              <th className="sortable" onClick={() => toggleSort("dueDate")}>Due Date{sortIcon("dueDate")}</th>
-              <th className="sortable" onClick={() => toggleSort("responsible")}>Responsible{sortIcon("responsible")}</th>
-              <th>Comment</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 ? (
-              <tr><td colSpan={8} className="empty-state"><p>No tasks match your filters.</p></td></tr>
-            ) : (
-              filtered.map((t) => {
+        {filtered.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state__icon">✅</div>
+            <div className="empty-state__title">No tasks found</div>
+            <p>Try adjusting your filters, or add a new task.</p>
+          </div>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th className="sortable" onClick={() => toggleSort("title")}>Task{arrow("title")}</th>
+                <th className="sortable" onClick={() => toggleSort("projectId")}>Project{arrow("projectId")}</th>
+                <th className="sortable" onClick={() => toggleSort("priority")}>Priority{arrow("priority")}</th>
+                <th className="sortable" onClick={() => toggleSort("status")}>Status{arrow("status")}</th>
+                <th className="sortable" onClick={() => toggleSort("dueDate")}>Due Date{arrow("dueDate")}</th>
+                <th className="sortable" onClick={() => toggleSort("responsible")}>Owner{arrow("responsible")}</th>
+                <th>Comment</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((t) => {
                 const overdue = isOverdue(t.dueDate, t.status);
                 return (
                   <tr key={t.id} className={overdue ? "row--overdue" : ""}>
-                    <td><strong>{t.title}</strong></td>
+                    <td><span style={{ fontWeight: 600 }}>{t.title}</span></td>
                     <td className="td-muted">{projectMap[t.projectId] || "—"}</td>
                     <td><span className={`badge ${BADGE_CLASS[t.priority] || ""}`}>{t.priority}</span></td>
                     <td><span className={`badge ${BADGE_CLASS[t.status] || ""}`}>{t.status}</span></td>
@@ -103,21 +108,24 @@ export default function TaskTable({ tasks, projects, onAdd, onEdit, onDelete }) 
                       {overdue && <span className="badge badge--overdue">Overdue</span>}
                     </td>
                     <td className="td-muted">{t.responsible || "—"}</td>
-                    <td className="td-muted" style={{ maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <td
+                      className="td-muted"
+                      style={{ maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                    >
                       {t.comment || "—"}
                     </td>
                     <td>
                       <div className="td-actions">
                         <button className="btn btn--ghost btn--sm" onClick={() => onEdit(t)}>Edit</button>
-                        <button className="btn btn--danger btn--sm" onClick={() => onDelete(t.id)}>Del</button>
+                        <button className="btn btn--danger btn--sm" onClick={() => onDelete(t.id)}>Delete</button>
                       </div>
                     </td>
                   </tr>
                 );
-              })
-            )}
-          </tbody>
-        </table>
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
