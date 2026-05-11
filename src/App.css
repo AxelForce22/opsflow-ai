@@ -229,7 +229,7 @@
 /* ---- KPI Cards ---- */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 16px;
   margin-bottom: 28px;
 }
@@ -448,6 +448,11 @@ tbody td { padding: 13px 16px; color: var(--text); vertical-align: middle; line-
 .badge--high        { background: var(--danger-light);  color: var(--danger-text); }
 .badge--overdue     { background: var(--danger);  color: #fff; margin-left: 6px; font-size: 10px; }
 
+/* Project health badges */
+.badge--healthy  { background: var(--success-light); color: var(--success-text); }
+.badge--at-risk  { background: var(--warning-light); color: var(--warning-text); }
+.badge--critical { background: var(--danger-light);  color: var(--danger-text);  }
+
 /* ---- Modal ---- */
 .modal-overlay {
   position: fixed;
@@ -587,6 +592,56 @@ tbody td { padding: 13px 16px; color: var(--text); vertical-align: middle; line-
   font-size: 12px;
   font-weight: 500;
 }
+
+/* ---- Risk Overview ---- */
+.risk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
+.risk-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface);
+}
+/* Left border colour matches health status */
+.risk-card--critical { border-left: 4px solid var(--danger); }
+.risk-card--at-risk  { border-left: 4px solid var(--warning); }
+
+.risk-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.risk-card__name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+.risk-card__meta { font-size: 11px; color: var(--text-muted); }
+
+/* List of reasons inside a risk card */
+.risk-reasons { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.risk-reason {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+.risk-reason__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.risk-reason__dot--critical { background: var(--danger); }
+.risk-reason__dot--at-risk  { background: var(--warning); }
 
 /* ---- Empty state ---- */
 .empty-state {

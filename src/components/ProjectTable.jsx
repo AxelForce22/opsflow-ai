@@ -1,10 +1,17 @@
 import { useState } from "react";
-import { formatCurrency, formatDate, BADGE_CLASS } from "../utils.js";
+import { formatCurrency, formatDate, BADGE_CLASS, getProjectHealth } from "../utils.js";
 
 const STATUS_OPTIONS   = ["All", "Planning", "Active", "Blocked", "Completed"];
 const CATEGORY_OPTIONS = ["All", "Real Estate", "Operations", "Sales Operations", "Vendor Management", "Finance", "HR", "IT", "Other"];
 
-export default function ProjectTable({ projects, onAdd, onEdit, onDelete }) {
+// Maps a health status string to its badge CSS class
+const HEALTH_BADGE = {
+  Healthy:   "badge--healthy",
+  "At Risk": "badge--at-risk",
+  Critical:  "badge--critical",
+};
+
+export default function ProjectTable({ projects, tasks, onAdd, onEdit, onDelete }) {
   const [search,  setSearch]  = useState("");
   const [statusF, setStatusF] = useState("All");
   const [catF,    setCatF]    = useState("All");
@@ -80,6 +87,7 @@ export default function ProjectTable({ projects, onAdd, onEdit, onDelete }) {
                 <th className="sortable" onClick={() => toggleSort("name")}>Project{arrow("name")}</th>
                 <th className="sortable" onClick={() => toggleSort("client")}>Client{arrow("client")}</th>
                 <th className="sortable" onClick={() => toggleSort("status")}>Status{arrow("status")}</th>
+                <th>Health</th>
                 <th className="sortable" onClick={() => toggleSort("category")}>Category{arrow("category")}</th>
                 <th className="sortable" onClick={() => toggleSort("deadline")}>Deadline{arrow("deadline")}</th>
                 <th className="sortable" onClick={() => toggleSort("responsible")}>Owner{arrow("responsible")}</th>
@@ -89,7 +97,10 @@ export default function ProjectTable({ projects, onAdd, onEdit, onDelete }) {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((p) => (
+              {filtered.map((p) => {
+                // Calculate health once per row so we can use it in both the badge and row styling
+                const health = getProjectHealth(p, tasks);
+                return (
                 <tr key={p.id}>
                   <td>
                     <div style={{ fontWeight: 600 }}>{p.name}</div>
@@ -101,6 +112,7 @@ export default function ProjectTable({ projects, onAdd, onEdit, onDelete }) {
                   </td>
                   <td className="td-muted">{p.client}</td>
                   <td><span className={`badge ${BADGE_CLASS[p.status] || ""}`}>{p.status}</span></td>
+                  <td><span className={`badge ${HEALTH_BADGE[health.status]}`}>{health.status}</span></td>
                   <td className="td-muted">{p.category}</td>
                   <td className="td-muted">{formatDate(p.deadline)}</td>
                   <td className="td-muted">{p.responsible}</td>
@@ -128,7 +140,8 @@ export default function ProjectTable({ projects, onAdd, onEdit, onDelete }) {
                     </div>
                   </td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         )}

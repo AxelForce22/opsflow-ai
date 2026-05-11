@@ -11,6 +11,7 @@ import ProjectModal   from "./components/ProjectModal.jsx";
 import TaskTable      from "./components/TaskTable.jsx";
 import TaskModal      from "./components/TaskModal.jsx";
 import BudgetAnalysis from "./components/BudgetAnalysis.jsx";
+import RiskOverview   from "./components/RiskOverview.jsx";
 import ActivityLog    from "./components/ActivityLog.jsx";
 import AboutSection   from "./components/AboutSection.jsx";
 
@@ -124,6 +125,7 @@ export default function App() {
                 <div className="page__subtitle">Live overview of all projects and tasks</div>
               </div>
               <KpiCards projects={projects} tasks={tasks} />
+              <RiskOverview projects={projects} tasks={tasks} />
               <ActivityLog activities={activities} />
             </div>
           )}
@@ -137,6 +139,7 @@ export default function App() {
               </div>
               <ProjectTable
                 projects={projects}
+                tasks={tasks}
                 onAdd={() => setProjectModal("new")}
                 onEdit={(p) => setProjectModal(p)}
                 onDelete={handleDeleteProject}
